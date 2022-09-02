@@ -4,6 +4,8 @@ import com.alibaba.ververica.cdc.connectors.mysql.MySQLSource;
 import com.alibaba.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.alibaba.ververica.cdc.debezium.DebeziumSourceFunction;
 import com.alibaba.ververica.cdc.debezium.table.RowDataDebeziumDeserializeSchema;
+import com.rison.bigdata.app.function.CustomerDeserialization;
+import com.rison.bigdata.utils.KafkaUtil;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
@@ -17,8 +19,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * @DATE: 2022/9/2 12:16
  * @PROJECT_NAME: flink-realtime-demo
  **/
-public class flinkCDC {
-    public static void main(String[] args) {
+public class FlinkCDC {
+    public static void main(String[] args) throws Exception {
         //TODO 1. create flink env
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -39,14 +41,20 @@ public class flinkCDC {
                 .username("")
                 .password("")
                 .databaseList("")
-                .deserializer()
+                .deserializer(new CustomerDeserialization())
                 .startupOptions(StartupOptions.latest())
                 .build();
 
         DataStreamSource<String> dataStreamSource = env.addSource(stringDebeziumSourceFunction);
         //TODO 4.数据写入到Kafka
         dataStreamSource.print();
-        dataStreamSource.addSink()
+        dataStreamSource.addSink(KafkaUtil
+                .<String>getKafkaProducer(
+                        "ods_base_db",
+                        "tbds-172-16-16-87:6669"
+                ));
+        //TODO 5. 启动任务
+        env.execute(FlinkCDC.class.getName());
 
 
     }

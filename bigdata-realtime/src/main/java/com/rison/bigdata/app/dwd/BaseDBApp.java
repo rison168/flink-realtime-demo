@@ -6,6 +6,7 @@ import com.alibaba.ververica.cdc.connectors.mysql.MySQLSource;
 import com.alibaba.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.alibaba.ververica.cdc.debezium.DebeziumSourceFunction;
 import com.rison.bigdata.app.function.CustomerDeserialization;
+import com.rison.bigdata.app.function.DimSinkFunction;
 import com.rison.bigdata.app.function.TableProcessFunction;
 import com.rison.bigdata.bean.TableProcess;
 import com.rison.bigdata.utils.KafkaUtil;
@@ -94,7 +95,7 @@ public class BaseDBApp {
         hbaseDS.print("hbase:");
 
         //TODO 8. 将hbase 数据写到hbase
-
+        hbaseDS.addSink(new DimSinkFunction());
         //TODO 9. 将kafka数据写到kafka
         kafka.addSink(KafkaUtil.<JSONObject>getKafkaProducer(
                 "default_topic",

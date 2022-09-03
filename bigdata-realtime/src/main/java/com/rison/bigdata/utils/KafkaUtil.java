@@ -1,8 +1,11 @@
 package com.rison.bigdata.utils;
 
+import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -20,6 +23,7 @@ import java.util.Properties;
 public class KafkaUtil {
     /**
      * get FlinkKafkaProducer<T>
+     *
      * @param topic
      * @param servers
      * @return
@@ -31,6 +35,40 @@ public class KafkaUtil {
                 producerProps(servers)
         );
     }
+
+    /**
+     * get FlinkKafkaProducer<T>
+     * @param topic
+     * @param servers
+     * @param kafkaSerializationSchema
+     * @param <T>
+     * @return
+     */
+    public static <T> FlinkKafkaProducer<T> getKafkaProducer(String topic, String servers, KafkaSerializationSchema<T> kafkaSerializationSchema) {
+        return new FlinkKafkaProducer<T>(
+                topic,
+                kafkaSerializationSchema,
+                producerProps(servers),
+                FlinkKafkaProducer.Semantic.EXACTLY_ONCE
+        );
+    }
+
+    /**
+     * get FlinkKafkaConsumer<T>
+     * @param groupId
+     * @param offsetResetType
+     * @param servers
+     * @param <T>
+     * @return
+     */
+    public static <T> FlinkKafkaConsumer<T> getKafkaConsumer(String topic, String groupId, String offsetResetType, String servers) {
+        return new FlinkKafkaConsumer<T>(
+                topic,
+                (DeserializationSchema<T>) new SimpleStringSchema(),
+                consumerProps(servers, groupId, offsetResetType)
+        );
+    }
+
 
     /**
      * kafka 消费者 properties

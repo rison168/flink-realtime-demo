@@ -26,7 +26,7 @@ public class FlinkCDC {
         env.setParallelism(1);
 
         //TODO 2. set checkpoint and back end
-        env.setStateBackend(new FsStateBackend("hdfs:///rison/bigdata/ck"));
+        env.setStateBackend(new FsStateBackend("hdfs:///rison/bigdata/cdc/ck"));
         env.enableCheckpointing(5000L);
         env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
         env.getCheckpointConfig().setCheckpointTimeout(1000L);

@@ -19,7 +19,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.flink.util.OutputTag;
 import org.apache.kafka.clients.producer.ProducerRecord;
-
 import javax.annotation.Nullable;
 
 /**
@@ -109,7 +108,6 @@ public class BaseDBApp {
                 }
                 )
         );
-
         env.execute(BaseDBApp.class.getName());
     }
 }
